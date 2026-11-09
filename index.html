@@ -321,6 +321,41 @@
   #toast.show{ transform:translate(-50%,0); }
   .sound-btn{ display:block; margin:2px auto 30px; border-radius:999px; padding:8px 16px; font-size:13px; letter-spacing:.12em; }
 
+  /* ---------- enhanced visuals ---------- */
+  .board-inner{ box-shadow:inset 0 0 42px rgba(0,20,60,.55), inset 0 0 0 1px rgba(60,90,180,.25); }
+  .cell.dl{ box-shadow:inset 0 0 0 1px #17264a, inset 0 0 10px rgba(0,229,255,.18); }
+  .cell.tl{ box-shadow:inset 0 0 0 1px #17264a, inset 0 0 10px rgba(77,124,255,.30); }
+  .cell.dw{ box-shadow:inset 0 0 0 1px #17264a, inset 0 0 10px rgba(255,46,166,.24); }
+  .cell.tw{ box-shadow:inset 0 0 0 1px #17264a, inset 0 0 12px rgba(255,59,60,.34); }
+  #board.live .cell:hover{ box-shadow:inset 0 0 0 2px rgba(0,229,255,.75), inset 0 0 12px rgba(0,229,255,.25); }
+  .cell.wglow{ box-shadow:inset 0 0 0 2px rgba(141,255,87,.9), inset 0 0 14px rgba(141,255,87,.32) !important; z-index:2; }
+  .cell.flash{ animation:cellflash 1.1s ease; }
+  @keyframes cellflash{ 0%,100%{ box-shadow:inset 0 0 0 1px #17264a; } 25%,60%{ box-shadow:inset 0 0 0 2px var(--amber), inset 0 0 16px rgba(255,179,0,.55); } }
+  .tile::after{ content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(115deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.05) 34%, transparent 55%); pointer-events:none; }
+  .tile.hv{ border-color:#9a7a33; }
+  .tile.hv .V{ color:var(--amber); text-shadow:0 0 6px rgba(255,179,0,.7); }
+  .tile.ghost{ opacity:.55; border-style:dashed; border-color:var(--lime); box-shadow:0 0 10px rgba(141,255,87,.5); animation:none; }
+  .tile.ghost .L{ color:var(--lime); text-shadow:0 0 8px rgba(141,255,87,.85); }
+  .rtile{ box-shadow:0 4px 0 #0d1430, 0 7px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.3); }
+  .rtile.hv .V{ color:var(--amber); text-shadow:0 0 6px rgba(255,179,0,.7); }
+  .chip.active{ animation:chippulse 1.6s ease-in-out infinite; }
+  @keyframes chippulse{ 0%,100%{ box-shadow:0 0 14px rgba(0,229,255,.35); } 50%{ box-shadow:0 0 24px rgba(0,229,255,.6); } }
+  .chip.foe.active{ animation-name:chippulsefoe; }
+  @keyframes chippulsefoe{ 0%,100%{ box-shadow:0 0 14px rgba(255,46,166,.35); } 50%{ box-shadow:0 0 24px rgba(255,46,166,.6); } }
+  .lead-line{ font-family:'Orbitron'; font-size:11px; font-weight:700; letter-spacing:.1em; margin-top:3px; color:var(--dim); white-space:nowrap; }
+  .lead-line.up{ color:var(--lime); } .lead-line.down{ color:#ff8296; }
+  #log li{ cursor:pointer; }
+  #log li:hover .mv{ text-decoration:underline; }
+  .two-list{ display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+  .two-list span{ font-family:'Orbitron'; font-size:11.5px; font-weight:700; background:rgba(16,26,54,.7); border:1px solid var(--line); border-radius:5px; padding:2px 6px; color:var(--ink); }
+  #confetti{ position:fixed; inset:0; pointer-events:none; z-index:95; overflow:hidden; }
+  #confetti i{ position:absolute; top:-16px; width:9px; height:14px; border-radius:2px; opacity:0; animation:cfall linear forwards; }
+  @keyframes cfall{ 0%{ opacity:1; transform:translateY(0) rotate(0deg); } 100%{ opacity:.85; transform:translateY(106vh) rotate(660deg); } }
+  .diff-card{ overflow:hidden; }
+  .diff-card::before{ content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.09) 48%, transparent 62%); transform:translateX(-120%); transition:transform .7s ease; pointer-events:none; }
+  .diff-card:hover::before{ transform:translateX(120%); }
+  .score-float.big{ font-size:34px; }
+
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
   }
@@ -351,6 +386,8 @@
         <li>First word must cover the <b>★</b>. Premium squares multiply only the turn they're covered. Use all 7 tiles for a <b>+50 BINGO</b>.</li>
         <li>The <b>?</b> tile is a blank — it can become any letter, but scores 0.</li>
         <li>No play? <b>Exchange</b> tiles or <b>Pass</b>. Game ends when someone plays out or after 6 scoreless turns in a row.</li>
+        <li>Stuck? <b>HINT</b> (3 per game) ghosts the strongest play the engine can find for your rack onto the board. Arrow keys move the cursor, <b>Tab</b> flips direction, <b>Esc</b> recalls.</li>
+        <li>Tap any word in the <b>move log</b> to flash where it landed, and check the <b>two-letter words</b> panel when a hook looks impossible.</li>
       </ul>
     </div>
   </section>
@@ -365,6 +402,7 @@
       <div class="hud-mid">
         <div class="bag-count" id="bagCount">▣ 93</div>
         <div class="bag-label">IN BAG</div>
+        <div class="lead-line" id="leadLine">TIED</div>
       </div>
       <div class="chip foe" id="chipFoe">
         <div class="who"><div class="nm" id="foeName">VOLT</div><div class="sub" id="foeSub">7 tiles</div></div>
@@ -390,14 +428,17 @@
 
         <div id="controls">
           <button class="btn primary" id="playBtn" disabled>PLAY</button>
+          <button class="btn" id="hintBtn" title="Ghost the strongest play the engine can find (3 per game)">HINT ×3</button>
           <button class="btn" id="recallBtn">RECALL</button>
           <button class="btn" id="dirBtn" title="Placement direction">DIR →</button>
+          <button class="btn" id="sortBtn" title="Sort rack A–Z">SORT</button>
           <button class="btn" id="shuffleBtn">SHUFFLE</button>
           <button class="btn" id="exchangeBtn">EXCHANGE</button>
           <button class="btn danger" id="passBtn">PASS</button>
         </div>
         <div id="exchangeBar" hidden>
           <button class="btn primary" id="confirmExchangeBtn">SWAP 0 TILES</button>
+          <button class="btn" id="allExchangeBtn">ALL</button>
           <button class="btn" id="cancelExchangeBtn">CANCEL</button>
         </div>
         <div id="statusLine"></div>
@@ -420,6 +461,11 @@
         <div class="panel">
           <h3>UNSEEN TILES · <span id="unseenCount">100</span></h3>
           <div class="unseen-grid" id="unseenGrid"></div>
+        </div>
+        <div class="panel">
+          <h3>TWO-LETTER WORDS · <span id="twoCount">…</span></h3>
+          <div class="two-list" id="twoList" hidden></div>
+          <button class="btn" id="twoToggle" style="width:100%; font-size:14px; padding:8px 6px; margin-top:8px;">SHOW ALL</button>
         </div>
         <div class="panel">
           <h3>SESSION RECORD</h3>
@@ -465,6 +511,7 @@
   </div>
 </div>
 
+<div id="confetti" aria-hidden="true"></div>
 <div id="toast" role="status"></div>
 <button class="btn sound-btn" id="soundBtn">SOUND: ON</button>
 
@@ -587,6 +634,7 @@ function newGame(diffKey){
     scoreless: 0, over: false, started: false,
     lastMoveIdx: new Set(),
     movesPlayed: 0,
+    hints: 3, hint: null, bagWarned: false,
   };
   drawTiles(G.you, 7); drawTiles(G.foe, 7);
 }
@@ -914,6 +962,20 @@ function toast(msg, ms){
   clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.classList.remove("show"), ms || 2400);
 }
 function mood(list){ $("foeMood").textContent = list[(Math.random() * list.length) | 0]; }
+function confetti(n){
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const layer = $("confetti");
+  const colors = ["#00e5ff", "#ff2ea6", "#8dff57", "#ffb300", "#4d7cff", "#ffffff"];
+  for (let i = 0; i < (n || 26); i++){
+    const s = document.createElement("i");
+    s.style.left = (Math.random() * 100) + "vw";
+    s.style.background = colors[i % colors.length];
+    s.style.animationDuration = (1.6 + Math.random() * 1.6) + "s";
+    s.style.animationDelay = (Math.random() * 0.35) + "s";
+    layer.appendChild(s);
+    setTimeout(() => s.remove(), 3900);
+  }
+}
 
 /* ================= BOARD / RACK RENDERING ================= */
 function buildBoard(){
@@ -931,7 +993,7 @@ function buildBoard(){
 }
 function tileDiv(L, blank, cls){
   const d = document.createElement("div");
-  d.className = "tile " + (cls || "") + (blank ? " blanktile" : "");
+  d.className = "tile " + (cls || "") + (blank ? " blanktile" : "") + (!blank && VALUES[L] >= 8 ? " hv" : "");
   d.innerHTML = '<span class="L">' + L + '</span>' + (blank ? "" : '<span class="V">' + VALUES[L] + "</span>");
   return d;
 }
@@ -951,6 +1013,13 @@ function renderBoardTiles(){
     d.addEventListener("click", ev => { ev.stopPropagation(); recallTile(p.idx); });
     cell.appendChild(d);
   }
+  if (G.hint){
+    for (const p of G.hint){
+      const cell = cellEls[p.idx];
+      if (cell.querySelector(".tile")) continue;
+      cell.appendChild(tileDiv(p.L, p.blank, "ghost"));
+    }
+  }
 }
 function renderRack(dealAnim){
   rackEl.innerHTML = "";
@@ -958,7 +1027,7 @@ function renderRack(dealAnim){
   G.you.rack.forEach((t, i) => {
     if (placedIds.has(t.id)) return;
     const b = document.createElement("button");
-    b.className = "rtile" + (t.L === "_" ? " isblank" : "") + (dealAnim ? " dealt" : "");
+    b.className = "rtile" + (t.L === "_" ? " isblank" : "") + (t.L !== "_" && VALUES[t.L] >= 8 ? " hv" : "") + (dealAnim ? " dealt" : "");
     if (dealAnim) b.style.animationDelay = (i * 45) + "ms";
     if (G.armedTile === t.id) b.classList.add("sel");
     if (G.marked.has(t.id)) b.classList.add("marked");
@@ -970,7 +1039,7 @@ function renderRack(dealAnim){
   });
 }
 function renderCursor(){
-  cellEls.forEach(cell => { cell.classList.remove("cursor", "path"); cell.removeAttribute("data-arrow"); });
+  cellEls.forEach(cell => { cell.classList.remove("cursor", "path", "wglow"); cell.removeAttribute("data-arrow"); });
   if (!G || G.turn !== "you" || G.over || !G.cursor) return;
   const { idx, dir } = G.cursor;
   cellEls[idx].classList.add("cursor");
@@ -985,9 +1054,30 @@ function renderCursor(){
     i += step;
   }
 }
+const shownScore = { you: 0, foe: 0 };
+function tweenScore(el, key, target){
+  const from = shownScore[key];
+  shownScore[key] = target;
+  if (from === target){ el.textContent = target; return; }
+  const t0 = performance.now(), dur = 480;
+  (function step(t){
+    const k = Math.min(1, Math.max(0, (t - t0) / dur));
+    el.textContent = Math.round(from + (target - from) * (1 - Math.pow(1 - k, 3)));
+    if (k < 1 && shownScore[key] === target) requestAnimationFrame(step);
+    else el.textContent = target;
+  })(t0);
+}
 function renderHUD(){
-  $("youScore").textContent = G.you.score;
-  $("foeScore").textContent = G.foe.score;
+  tweenScore($("youScore"), "you", G.you.score);
+  tweenScore($("foeScore"), "foe", G.foe.score);
+  const diff = G.you.score - G.foe.score;
+  const lead = $("leadLine");
+  lead.textContent = diff === 0 ? "TIED" : diff > 0 ? "YOU +" + diff : G.diff.name + " +" + (-diff);
+  lead.className = "lead-line" + (diff > 0 ? " up" : diff < 0 ? " down" : "");
+  if (G.bag.length === 0 && !G.bagWarned && G.movesPlayed > 0 && !G.over){
+    G.bagWarned = true;
+    toast("Bag empty — endgame! Play out or protect your lead.");
+  }
   const placedIds = new Set(G.placed.map(p => p.tileId));
   $("youSub").textContent = (G.you.rack.length - placedIds.size) + " tiles";
   $("foeSub").textContent = G.foe.rack.length + " tiles";
@@ -1015,15 +1105,30 @@ function renderUnseen(){
   }
   $("unseenCount").textContent = total;
 }
-function renderAll(dealAnim){
-  renderBoardTiles(); renderRack(dealAnim); renderCursor(); renderHUD(); renderUnseen(); updatePreview(); updateControls();
+function renderGlow(){
+  if (!G.placed.length) return;
+  const a = currentAnalysis();
+  if (a && a.ok) for (const w of a.words) for (const idx of w.cells) cellEls[idx].classList.add("wglow");
 }
-function logMove(who, text, pts, note){
+function renderAll(dealAnim){
+  renderBoardTiles(); renderRack(dealAnim); renderCursor(); renderGlow(); renderHUD(); renderUnseen(); updatePreview(); updateControls();
+  boardEl.classList.toggle("live", !!G && G.turn === "you" && !G.over);
+}
+function logMove(who, text, pts, note, cells){
   const li = document.createElement("li");
   li.innerHTML = '<span class="who ' + (who === "you" ? "you" : "foe") + '">' + (who === "you" ? "YOU" : G.diff.name) + '</span>' +
     '<span class="mv">' + text + "</span>" +
     (note ? '<span class="note">' + note + "</span>" : "") +
     (pts != null ? '<span class="pts">' + (pts >= 0 ? "+" : "") + pts + "</span>" : "");
+  if (cells && cells.length){
+    li.title = "Tap to find this word on the board";
+    li.addEventListener("click", () => {
+      for (const idx of cells){
+        const cell = cellEls[idx];
+        cell.classList.remove("flash"); void cell.offsetWidth; cell.classList.add("flash");
+      }
+    });
+  }
   const log = $("log");
   log.prepend(li);
   while (log.children.length > 40) log.lastChild.remove();
@@ -1065,7 +1170,9 @@ function updateControls(){
   $("playBtn").textContent = a && a.ok ? "PLAY · " + a.total + " PTS" : "PLAY";
   $("recallBtn").disabled = !G.placed.length || !myTurn;
   $("dirBtn").textContent = "DIR " + (!G.cursor || G.cursor.dir === "H" ? "→" : "↓");
-  ["dirBtn","shuffleBtn","passBtn"].forEach(id => $(id).disabled = !myTurn || G.exchangeMode);
+  ["dirBtn","shuffleBtn","passBtn","sortBtn"].forEach(id => $(id).disabled = !myTurn || G.exchangeMode);
+  $("hintBtn").disabled = !myTurn || G.exchangeMode || hintBusy;
+  if (!hintBusy) $("hintBtn").textContent = G.hint ? "HINT ✕ CLEAR" : "HINT ×" + G.hints;
   $("exchangeBtn").disabled = !myTurn || G.bag.length < 7 || G.exchangeMode;
   $("confirmExchangeBtn").textContent = "SWAP " + G.marked.size + " TILE" + (G.marked.size === 1 ? "" : "S");
   $("confirmExchangeBtn").disabled = G.marked.size === 0;
@@ -1084,6 +1191,7 @@ function nextCursorPos(fromIdx, dir){
   return null;
 }
 function placeTile(tile, idx, chosenLetter){
+  G.hint = null;
   const blank = tile.L === "_";
   G.placed.push({ idx, tileId: tile.id, L: blank ? chosenLetter : tile.L, blank });
   if (G.cursor){
@@ -1106,6 +1214,7 @@ function tryPlace(tile, idx){
 function recallTile(idx){
   const i = G.placed.findIndex(p => p.idx === idx);
   if (i === -1) return;
+  G.hint = null;
   G.placed.splice(i, 1);
   G.cursor = { idx, dir: G.cursor ? G.cursor.dir : "H" };
   sfx.turn();
@@ -1113,6 +1222,7 @@ function recallTile(idx){
 }
 function recallAll(){
   if (!G.placed.length) return;
+  G.hint = null;
   const first = G.placed[0].idx;
   G.placed = [];
   G.cursor = { idx: first, dir: G.cursor ? G.cursor.dir : "H" };
@@ -1201,6 +1311,27 @@ document.addEventListener("keydown", ev => {
     if (G.placed.length) recallTile(G.placed[G.placed.length - 1].idx);
     ev.preventDefault(); return;
   }
+  if (ev.key === "Escape"){
+    if (G.placed.length) recallAll();
+    else if (G.hint){ G.hint = null; renderAll(false); }
+    ev.preventDefault(); return;
+  }
+  if (ev.key === "Tab"){
+    if (!G.cursor) G.cursor = { idx: CENTER, dir: "V" };
+    else G.cursor.dir = G.cursor.dir === "H" ? "V" : "H";
+    sfx.turn(); renderCursor(); updateControls(); ev.preventDefault(); return;
+  }
+  if (ev.key.startsWith("Arrow")){
+    if (!G.cursor) G.cursor = { idx: CENTER, dir: "H" };
+    let r = G.cursor.idx / 15 | 0, c = G.cursor.idx % 15;
+    if (ev.key === "ArrowLeft") c = Math.max(0, c - 1);
+    else if (ev.key === "ArrowRight") c = Math.min(14, c + 1);
+    else if (ev.key === "ArrowUp") r = Math.max(0, r - 1);
+    else if (ev.key === "ArrowDown") r = Math.min(14, r + 1);
+    else return;
+    G.cursor = { idx: r * 15 + c, dir: G.cursor.dir };
+    renderCursor(); ev.preventDefault(); return;
+  }
   if (ev.key === "Enter"){ if (!$("playBtn").disabled) $("playBtn").click(); return; }
   if (ev.key.length === 1 && /[a-zA-Z]/.test(ev.key)){
     const L = ev.key.toUpperCase();
@@ -1244,12 +1375,13 @@ function playYours(){
   if (!a || !a.ok) return;
   const placements = G.placed.map(p => ({ ...p }));
   G.placed = [];
+  G.hint = null;
   commitPlacements("you", placements, a);
   const mw = mainWordOf(a);
-  logMove("you", mw, a.total, a.bingo ? "BINGO!" : (a.words.length > 1 ? "+" + (a.words.length - 1) + " cross" : ""));
+  logMove("you", mw, a.total, a.bingo ? "BINGO!" : (a.words.length > 1 ? "+" + (a.words.length - 1) + " cross" : ""), a.words.flatMap(w => w.cells));
   renderAll(true);
   floatScore(placements[0].idx, a.total, false);
-  if (a.bingo){ sfx.bingo(); toast("BINGO! +50 bonus"); } else sfx.play();
+  if (a.bingo){ sfx.bingo(); toast("BINGO! +50 bonus"); confetti(30); } else sfx.play();
   mood(a.total >= 28 ? MOODS.foeGood : a.total <= 8 ? MOODS.foeBad : MOODS.start);
   setStatus("<b>" + mw + "</b> locked in for " + a.total + ". " + G.diff.name + " is thinking…");
   if (checkEnd("you")) return;
@@ -1296,7 +1428,7 @@ function aiTurn(){
     const placements = mv.placements.map(p => ({ idx: p.idx, L: p.L, blank: p.blank }));
     commitPlacements("foe", placements, { total: mv.score });
     const mw = mainWordOf(mv);
-    logMove("foe", mw, mv.score, mv.bingo ? "BINGO!" : (mv.words.length > 1 ? "+" + (mv.words.length - 1) + " cross" : ""));
+    logMove("foe", mw, mv.score, mv.bingo ? "BINGO!" : (mv.words.length > 1 ? "+" + (mv.words.length - 1) + " cross" : ""), (mv.words || []).flatMap(w => w.cells));
     renderAll(false);
     floatScore(placements[0].idx, mv.score, true);
     if (mv.bingo){ sfx.bingo(); toast(G.diff.name + " dropped a BINGO: " + mw); } else sfx.play();
@@ -1337,7 +1469,7 @@ function doPass(){
   G.turn = "foe"; renderAll(false);
   setTimeout(aiTurn, 420);
 }
-function recallAllSilent(){ G.placed = []; }
+function recallAllSilent(){ G.placed = []; G.hint = null; }
 
 /* ================= ENDGAME ================= */
 function rackValue(rack){ return rack.reduce((s, t) => s + VALUES[t.L], 0); }
@@ -1382,7 +1514,7 @@ function finishGame(sub, adj){
   mood(youWin ? MOODS.lose : MOODS.win);
   updateRecLine();
   setTimeout(()=> { $("overModal").hidden = false; }, 650);
-  if (youWin) sfx.bingo(); else sfx.error();
+  if (youWin){ sfx.bingo(); confetti(46); } else sfx.error();
 }
 function updateRecLine(){
   const parts = Object.keys(DIFFS).map(k => {
@@ -1394,6 +1526,46 @@ function updateRecLine(){
 
 /* ================= CONTROLS WIRING ================= */
 $("playBtn").addEventListener("click", playYours);
+let hintBusy = false;
+$("hintBtn").addEventListener("click", () => {
+  if (!G || G.turn !== "you" || G.over || G.exchangeMode || hintBusy) return;
+  if (G.hint){ G.hint = null; renderAll(false); setStatus("Hint cleared. Your move."); return; }
+  if (G.hints <= 0){ toast("No hints left this game"); sfx.error(); return; }
+  hintBusy = true;
+  $("hintBtn").disabled = true;
+  $("hintBtn").textContent = "SCANNING…";
+  setTimeout(() => {
+    hintBusy = false;
+    if (!G || G.over){ updateControls(); return; }
+    if (G.placed.length) recallAllSilent();
+    let best = null;
+    try{
+      const moves = genAllMoves(G.you.rack, TRIE_FULL, 150000);
+      for (const m of moves) if (!best || m.score > best.score) best = m;
+    }catch(e){ best = null; }
+    if (!best){
+      setStatus("The engine found <b>no legal play</b> for this rack — exchange or pass.");
+      toast("No plays found for this rack");
+      sfx.error();
+    } else {
+      G.hints--;
+      G.hint = best.placements.map(p => ({ idx: p.idx, L: p.L, blank: p.blank }));
+      const mw = mainWordOf(best);
+      setStatus("Hint: <b>" + mw + "</b> scores <b>" + best.score + "</b>" + (best.bingo ? " — a BINGO!" : "") + ". Ghost tiles mark the spot. " + G.hints + " hint" + (G.hints === 1 ? "" : "s") + " left.");
+      sfx.play();
+    }
+    renderAll(false);
+  }, 30);
+});
+$("sortBtn").addEventListener("click", () => {
+  if (!G) return;
+  const placedIds = new Set(G.placed.map(p => p.tileId));
+  const key = t => t.L === "_" ? "{" : t.L;
+  const free = G.you.rack.filter(t => !placedIds.has(t.id)).sort((a, b) => key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0);
+  let j = 0;
+  G.you.rack = G.you.rack.map(t => placedIds.has(t.id) ? t : free[j++]);
+  sfx.turn(); renderRack(false);
+});
 $("recallBtn").addEventListener("click", recallAll);
 $("dirBtn").addEventListener("click", () => {
   if (!G) return;
@@ -1417,6 +1589,18 @@ $("exchangeBtn").addEventListener("click", () => {
   G.exchangeMode = true; G.marked.clear();
   $("controls").hidden = true; $("exchangeBar").hidden = false;
   renderAll(false);
+});
+$("allExchangeBtn").addEventListener("click", () => {
+  if (!G) return;
+  G.you.rack.forEach(t => G.marked.add(t.id));
+  sfx.turn(); renderRack(false); updateControls();
+});
+$("twoToggle").addEventListener("click", () => {
+  const list = $("twoList");
+  const show = list.hidden;
+  list.hidden = !show;
+  $("twoToggle").textContent = show ? "HIDE" : "SHOW ALL";
+  if (show) sfx.turn();
 });
 $("cancelExchangeBtn").addEventListener("click", () => {
   G.exchangeMode = false; G.marked.clear();
@@ -1493,6 +1677,8 @@ function buildSetup(){
 }
 function startGame(diffKey){
   newGame(diffKey);
+  shownScore.you = 0; shownScore.foe = 0;
+  $("youScore").textContent = "0"; $("foeScore").textContent = "0";
   const d = G.diff;
   $("setup").hidden = true;
   $("game").hidden = false;
@@ -1532,6 +1718,9 @@ setTimeout(() => {
     TRIE_COMMON = buildTrie([...COMMON_WORDS]);
     TRIE_FULL = buildTrie(words);
     DICT_READY = true;
+    const twos = [...WORDS].filter(w => w.length === 2).map(w => w.toUpperCase()).sort();
+    $("twoCount").textContent = twos.length;
+    $("twoList").innerHTML = twos.map(w => "<span>" + w + "</span>").join("");
     $("lexStatus").textContent = "LEXICON ONLINE · " + WORDS.size.toLocaleString() + " WORDS LOADED · " + Math.round(performance.now() - t0) + "MS";
     $("startBtn").disabled = false;
   }catch(e){

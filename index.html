@@ -128,7 +128,7 @@
   .side{ flex:0 1 300px; min-width:250px; display:flex; flex-direction:column; gap:12px; }
   @media (max-width:880px){
     .play-area{ flex-direction:column; align-items:center; }
-    .side{ width:100%; max-width:560px; flex:none; }
+    .side{ width:100%; max-width:560px; flex:none; min-width:0; }
   }
 
   /* ---------- HUD ---------- */
@@ -614,6 +614,7 @@ let G = null;
 let selectedDiff = "challenger";
 const RECORD = {}; Object.keys(DIFFS).forEach(k => RECORD[k] = { w:0, l:0 });
 let tileSeq = 1;
+let gameSeq = 0;
 
 function newGame(diffKey){
   const bag = [];
@@ -621,6 +622,7 @@ function newGame(diffKey){
   bag.push("_", "_");
   shuffleArr(bag);
   G = {
+    id: ++gameSeq,
     diff: DIFFS[diffKey],
     board: new Array(CELLS).fill(null),   // {L, blank}
     bag,
@@ -758,6 +760,11 @@ function isAnchor(board, idx){
          (c > 0 && !!board[idx - 1]) || (c < 14 && !!board[idx + 1]);
 }
 
+/* Wall-clock budget for one genAllMoves call, set by genAllMoves. On slow
+   hardware the node cap alone can mean a multi-second freeze (a blank-heavy
+   rack on an open board has 20k+ legal moves); when the budget runs out the
+   generator returns the legal moves found so far instead of hanging. */
+let genDeadline = 0;
 /* Generate horizontal moves on board B; caller transposes for vertical. */
 function genMovesH(B, rack, trie, cap, boardEmpty){
   const base = rackCounts(rack);
@@ -776,6 +783,7 @@ function genMovesH(B, rack, trie, cap, boardEmpty){
   function extendRight(node, row, col, placed, rc, bl, wordLen, coversCenter){
     if (aborted) return;
     if (++nodes > cap){ aborted = true; return; }
+    if ((nodes & 2047) === 0 && performance.now() > genDeadline){ aborted = true; return; }
     if (col > 14){
       if (trie.isWord[node]) record(placed, wordLen, coversCenter);
       return;
@@ -858,6 +866,7 @@ function transposeBoard(B){
   return T;
 }
 function genAllMoves(rack, trie, cap){
+  genDeadline = performance.now() + Math.min(6000, Math.max(1500, cap / 120));
   const boardEmpty = G.board.every(x => !x);
   let all = genMovesH(G.board, rack, trie, cap, boardEmpty);
   const T = transposeBoard(G.board);
@@ -904,7 +913,8 @@ function aiChooseMove(){
     return pool[(Math.random() * pool.length) | 0];
   }
   if (d.pick === "mid"){
-    const best = Math.max(...moves.map(m => m.score));
+    let best = 0;
+    for (const m of moves) if (m.score > best) best = m.score;
     const pool = moves.filter(m => m.score >= best * 0.62);
     return pool[(Math.random() * pool.length) | 0];
   }
@@ -916,7 +926,8 @@ function aiChooseMove(){
   // best: grandmaster — score + full leave evaluation
   let bestMove = null, bestVal = -Infinity;
   for (const m of moves){
-    const v = m.score + leaveValue(remainingAfter(m)) + (G.bag.length === 0 && remainingAfter(m).length === 0 ? 6 : 0);
+    const rest = remainingAfter(m);
+    const v = m.score + leaveValue(rest) + (G.bag.length === 0 && rest.length === 0 ? 6 : 0);
     if (v > bestVal){ bestVal = v; bestMove = m; }
   }
   return bestMove;
@@ -1348,6 +1359,11 @@ function openBlankPicker(cb){
   blankCb = cb;
   $("blankModal").hidden = false;
 }
+$("blankCancel").addEventListener("click", ()=> {
+  $("blankModal").hidden = true;
+  blankCb = null;
+  sfx.turn();
+});
 /* ================= TURN FLOW ================= */
 function mainWordOf(a){
   if (!a.words.length) return "";
@@ -1387,15 +1403,17 @@ function playYours(){
   if (checkEnd("you")) return;
   G.turn = "foe";
   renderAll(false);
-  setTimeout(aiTurn, 420);
+  const gid = G.id;
+  setTimeout(() => aiTurn(gid), 420);
 }
-function aiTurn(){
-  if (!G || G.over) return;
+function aiTurn(gid){
+  if (!G || G.over || (gid != null && G.id !== gid)) return;
   G.turn = "foe";
   $("thinking").hidden = false;
   $("thinkName").textContent = G.diff.name;
   renderHUD(); updatePreview(); updateControls();
   setTimeout(() => {
+    if (!G || G.over || (gid != null && G.id !== gid)){ $("thinking").hidden = true; return; }
     let mv = null;
     try{ mv = aiChooseMove(); }catch(e){ mv = null; }
     $("thinking").hidden = true;
@@ -1403,12 +1421,14 @@ function aiTurn(){
       // exchange or pass
       if (G.bag.length >= 7){
         const ids = aiPickExchange();
+        const aside = [];
         for (const id of ids){
           const i = G.foe.rack.findIndex(t => t.id === id);
-          if (i !== -1){ G.bag.push(G.foe.rack[i].L); G.foe.rack.splice(i, 1); }
+          if (i !== -1){ aside.push(G.foe.rack[i].L); G.foe.rack.splice(i, 1); }
         }
-        shuffleArr(G.bag);
         drawTiles(G.foe, 7 - G.foe.rack.length);
+        for (const L of aside) G.bag.push(L);
+        shuffleArr(G.bag);
         logMove("foe", "EXCHANGE", null, ids.length + " tiles");
         setStatus(G.diff.name + " swapped " + ids.length + " tiles. Your move.");
       } else {
@@ -1441,12 +1461,14 @@ function aiTurn(){
   }, G.diff.thinkMs);
 }
 function doExchange(ids){
+  const aside = [];
   for (const id of ids){
     const i = G.you.rack.findIndex(t => t.id === id);
-    if (i !== -1){ G.bag.push(G.you.rack[i].L); G.you.rack.splice(i, 1); }
+    if (i !== -1){ aside.push(G.you.rack[i].L); G.you.rack.splice(i, 1); }
   }
-  shuffleArr(G.bag);
   drawTiles(G.you, 7 - G.you.rack.length);
+  for (const L of aside) G.bag.push(L);
+  shuffleArr(G.bag);
   G.placed = []; G.marked.clear(); G.exchangeMode = false;
   $("exchangeBar").hidden = true; $("controls").hidden = false;
   logMove("you", "EXCHANGE", null, ids.length + " tiles");
@@ -1456,7 +1478,8 @@ function doExchange(ids){
   setStatus("Tiles swapped. " + G.diff.name + " is thinking…");
   if (checkEnd("you")) return;
   G.turn = "foe"; renderAll(false);
-  setTimeout(aiTurn, 420);
+  const gid = G.id;
+  setTimeout(() => aiTurn(gid), 420);
 }
 function doPass(){
   recallAllSilent();
@@ -1467,7 +1490,8 @@ function doPass(){
   setStatus("You passed. " + G.diff.name + " is thinking…");
   if (checkEnd("you")) return;
   G.turn = "foe"; renderAll(false);
-  setTimeout(aiTurn, 420);
+  const gid = G.id;
+  setTimeout(() => aiTurn(gid), 420);
 }
 function recallAllSilent(){ G.placed = []; G.hint = null; }
 
@@ -1481,9 +1505,10 @@ function checkEnd(lastPlayer){
     const outP = youOut ? "you" : "foe";
     const other = youOut ? G.foe : G.you;
     const bonus = rackValue(other.rack);
-    if (youOut) G.you.score += bonus; else G.foe.score += bonus;
+    if (youOut){ G.you.score += bonus; G.foe.score -= bonus; } else { G.foe.score += bonus; G.you.score -= bonus; }
     finishGame(outP === "you" ? "You played your last tile!" : G.diff.name + " played its last tile!",
-      (outP === "you" ? "You gain " : G.diff.name + " gains ") + bonus + " from the rival rack.");
+      (outP === "you" ? "You gain " : G.diff.name + " gains ") + bonus + " from the rival rack — " +
+      (outP === "you" ? G.diff.name + " also loses " : "you also lose ") + bonus + ".");
     return true;
   }
   if (G.scoreless >= 6){
@@ -1683,6 +1708,11 @@ function startGame(diffKey){
   $("setup").hidden = true;
   $("game").hidden = false;
   $("overModal").hidden = true;
+  $("exchangeBar").hidden = true;
+  $("controls").hidden = false;
+  $("thinking").hidden = true;
+  clearTimeout(passTimer); passArmed = false;
+  $("passBtn").textContent = "PASS"; $("passBtn").classList.remove("armed");
   $("foeName").textContent = d.name;
   $("foeCardName").textContent = d.name;
   $("foeCardName").style.color = d.acc;

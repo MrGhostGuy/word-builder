@@ -16,7 +16,7 @@
     --panel:rgba(10,16,34,.82); --panel2:rgba(13,20,42,.92);
     --line:#1d2a4d; --line2:#2a3c6e;
     --cyan:#00e5ff; --cyan-dim:#0e7d99;
-    --mag:#ff2ea6; --lime:#8dff57; --amber:#ffb300; --red:#ff3b5c; --blue:#4d7cff;
+    --mag:#ff2ea6; --lime:#76B900; --amber:#ffb300; --red:#ff3b5c; --blue:#4d7cff;
     --ink:#eaf2ff; --dim:#8fa3c8; --dim2:#5d6f96;
     --tile-hi:#39466e; --tile-lo:#1a2340;
     --rad:14px;
@@ -356,6 +356,36 @@
   .diff-card:hover::before{ transform:translateX(120%); }
   .score-float.big{ font-size:34px; }
 
+  /* ===== v3 ALIEN SKIN + CAREER UI ===== */
+  body{ background:
+    radial-gradient(1.6px 1.6px at 12% 20%, rgba(255,255,255,.85), transparent 60%),
+    radial-gradient(1.2px 1.2px at 32% 68%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(1.8px 1.8px at 54% 12%, rgba(190,255,220,.8), transparent 60%),
+    radial-gradient(1.2px 1.2px at 71% 42%, rgba(255,255,255,.65), transparent 60%),
+    radial-gradient(1.5px 1.5px at 86% 78%, rgba(255,255,255,.75), transparent 60%),
+    radial-gradient(1.1px 1.1px at 44% 88%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(560px 300px at 82% -60px, rgba(118,185,0,.16), transparent 70%),
+    radial-gradient(640px 340px at 8% 108%, rgba(0,229,255,.13), transparent 70%),
+    linear-gradient(180deg,#020409,#04070d); background-attachment:fixed; }
+  .game-title{ background:linear-gradient(92deg,#76B900 5%,#b6ff4d 38%,#00e5ff 95%); -webkit-background-clip:text; background-clip:text; color:transparent !important; filter:drop-shadow(0 0 16px rgba(0,229,255,.30)) drop-shadow(0 2px 22px rgba(118,185,0,.25)); }
+  .tagline{ color:#9fe870 !important; letter-spacing:.34em !important; }
+  #careerPanel{ max-width:560px; margin:14px auto 4px; padding:12px 14px; background:var(--panel); border:1px solid var(--line2); border-radius:var(--rad); box-shadow:0 0 24px rgba(0,229,255,.08), inset 0 0 32px rgba(118,185,0,.05); text-align:left; }
+  .career-head{ display:flex; justify-content:space-between; align-items:baseline; }
+  .career-rank{ font-family:'Orbitron'; font-weight:800; font-size:15px; color:#b6ff4d; letter-spacing:.08em; text-shadow:0 0 12px rgba(118,185,0,.6); }
+  .career-xp{ font-family:'Orbitron'; font-size:12px; color:var(--cyan); }
+  .xpbar{ height:8px; margin:8px 0 5px; background:#0a1226; border:1px solid var(--line); border-radius:99px; overflow:hidden; }
+  .xpbar i{ display:block; height:100%; background:linear-gradient(90deg,#76B900,#00e5ff); box-shadow:0 0 10px rgba(0,229,255,.7); }
+  .career-sub{ font-size:11px; color:var(--dim); }
+  .career-stats{ display:flex; flex-wrap:wrap; gap:5px 14px; margin-top:8px; font-family:'Orbitron'; font-size:10.5px; color:var(--ink); }
+  .ach-row{ display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+  .ach-chip{ font-family:'Orbitron'; font-size:9.5px; padding:3px 8px; border-radius:99px; border:1px solid var(--line); color:var(--dim2); background:rgba(10,16,34,.6); }
+  .ach-chip.on{ color:#ffe9a8; border-color:#ffb300; box-shadow:0 0 10px rgba(255,179,0,.35); }
+  .mode-row{ display:flex; gap:8px; justify-content:center; margin:8px auto 2px; max-width:560px; }
+  .mode-btn{ flex:1; font-family:'Orbitron'; font-weight:700; font-size:12.5px; letter-spacing:.06em; padding:11px 4px; color:var(--dim); background:rgba(10,16,34,.75); border:1px solid var(--line2); border-radius:10px; cursor:pointer; }
+  .mode-btn.sel{ color:#eaffea; border-color:#76B900; box-shadow:0 0 16px rgba(118,185,0,.45), inset 0 0 18px rgba(118,185,0,.12); }
+  .mode-note{ color:var(--dim); font-size:12.5px; text-align:center; min-height:18px; margin:4px auto 0; max-width:520px; }
+  .btn.primary{ background:linear-gradient(180deg,#8fd61f,#5c9400) !important; box-shadow:0 0 22px rgba(118,185,0,.5) !important; }
+
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
   }
@@ -374,8 +404,16 @@
       <div class="logo-tile" style="animation-delay:.45s">D</div>
     </div>
     <h1 class="game-title">WORD BUILDER</h1>
-    <p class="tagline">Neon Lexicon Combat Protocol</p>
+    <p class="tagline">Alien Lexicon Combat Protocol</p>
     <p class="lex-status" id="lexStatus">BOOTING LEXICON…</p>
+    <div id="careerPanel"></div>
+    <p class="pick-label">SELECT YOUR MISSION</p>
+    <div class="mode-row" id="modeRow">
+      <button class="mode-btn sel" data-mode="classic">CLASSIC</button>
+      <button class="mode-btn" data-mode="quick">QUICK · 150</button>
+      <button class="mode-btn" data-mode="daily">DAILY SIGNAL</button>
+    </div>
+    <p class="mode-note" id="modeNote">Full game — play out the whole bag.</p>
     <p class="pick-label">SELECT YOUR OPPONENT</p>
     <div class="diff-grid" id="diffGrid"></div>
     <button class="btn primary" id="startBtn" disabled>▶&nbsp; START GAME</button>
@@ -620,7 +658,12 @@ function newGame(diffKey){
   const bag = [];
   for (const L of ALPHA) for (let i = 0; i < COUNTS[L]; i++) bag.push(L);
   bag.push("_", "_");
-  shuffleArr(bag);
+  if (PENDING_MODE === "daily"){
+    const _origRandom = Math.random;
+    Math.random = mulberry32(dateSeed(todayKey()));
+    shuffleArr(bag);
+    Math.random = _origRandom;
+  } else shuffleArr(bag);
   G = {
     id: ++gameSeq,
     diff: DIFFS[diffKey],
@@ -636,7 +679,7 @@ function newGame(diffKey){
     scoreless: 0, over: false, started: false,
     lastMoveIdx: new Set(),
     movesPlayed: 0,
-    hints: 3, hint: null, bagWarned: false,
+    hints: 3, hint: null, bagWarned: false, mode: PENDING_MODE,
   };
   drawTiles(G.you, 7); drawTiles(G.foe, 7);
 }
@@ -1398,6 +1441,7 @@ function playYours(){
   renderAll(true);
   floatScore(placements[0].idx, a.total, false);
   if (a.bingo){ sfx.bingo(); toast("BINGO! +50 bonus"); confetti(30); } else sfx.play();
+  trackPlay(a.total, a.bingo);
   mood(a.total >= 28 ? MOODS.foeGood : a.total <= 8 ? MOODS.foeBad : MOODS.start);
   setStatus("<b>" + mw + "</b> locked in for " + a.total + ". " + G.diff.name + " is thinking…");
   if (checkEnd("you")) return;
@@ -1498,6 +1542,11 @@ function recallAllSilent(){ G.placed = []; G.hint = null; }
 /* ================= ENDGAME ================= */
 function rackValue(rack){ return rack.reduce((s, t) => s + VALUES[t.L], 0); }
 function checkEnd(lastPlayer){
+  if (G.mode === "quick" && (G.you.score >= 150 || G.foe.score >= 150)){
+    finishGame(G.you.score >= 150 ? "You hit 150 first — quick match decided!" : G.diff.name + " hit 150 first — quick match decided!",
+      "QUICK MATCH · first to 150 points takes it.");
+    return true;
+  }
   const bagEmpty = G.bag.length === 0;
   const youOut = bagEmpty && G.you.rack.length === 0;
   const foeOut = bagEmpty && G.foe.rack.length === 0;
@@ -1539,6 +1588,7 @@ function finishGame(sub, adj){
   mood(youWin ? MOODS.lose : MOODS.win);
   updateRecLine();
   setTimeout(()=> { $("overModal").hidden = false; }, 650);
+  recordCareer(youWin, tie);
   if (youWin){ sfx.bingo(); confetti(46); } else sfx.error();
 }
 function updateRecLine(){
@@ -1691,7 +1741,7 @@ function buildSetup(){
       '<div class="ai-role">' + d.role.split("·")[1].trim() + " · " + d.role.split("·")[0].trim() + "</div>" +
       '<div class="ai-desc">' + d.desc + "</div>" +
       bar("VOCAB", d.vocab) + bar("TACTICS", d.tact) + bar("SPEED", d.speed) +
-      '<div class="rec">' + (r.w + r.l ? "SESSION RECORD: " + r.w + "W – " + r.l + "L" : "UNTESTED — NO GAMES YET") + "</div>";
+      '<div class="rec">' + recTextFor(key, r) + "</div>";
     card.addEventListener("click", () => {
       selectedDiff = key;
       grid.querySelectorAll(".diff-card").forEach(c => c.classList.toggle("sel", c.dataset.diff === key));
@@ -1724,7 +1774,7 @@ function startGame(diffKey){
   $("stSpeed").style.width = d.speed * 100 + "%"; $("stSpeed").style.background = d.acc;
   mood(MOODS.start);
   G.cursor = { idx: CENTER, dir: "H" };
-  setStatus("Your move — first word must cover the <b>★</b>.");
+  setStatus(G.mode === "quick" ? "QUICK MATCH — first to <b>150</b> wins. First word must cover the <b>★</b>." : G.mode === "daily" ? "DAILY SIGNAL — today's tiles are identical for every commander. Beat VOLT!" : "Your move — first word must cover the <b>★</b>.");
   renderAll(true);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1734,7 +1784,89 @@ function backToSetup(){
   buildSetup();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-$("startBtn").addEventListener("click", ()=> { if (DICT_READY) startGame(selectedDiff); });
+$("startBtn").addEventListener("click", ()=> { if (!DICT_READY) return; PENDING_MODE = selectedMode; startGame(selectedMode === "daily" ? "challenger" : selectedDiff); });
+
+/* ================= v3: CAREER · MODES · ACHIEVEMENTS ================= */
+let selectedMode = "classic", PENDING_MODE = "classic";
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function dateSeed(s){ let h = 2166136261; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function todayKey(){ return new Date().toLocaleDateString("en-CA"); }
+const RANKS = [ {xp:0,name:"DRIFTER"}, {xp:300,name:"SIGNAL THIEF"}, {xp:800,name:"VOID SCRIBBLER"}, {xp:1600,name:"LEXICON RAIDER"}, {xp:2800,name:"STAR FORGER"}, {xp:4500,name:"OMEGA SLAYER"} ];
+const ACHS = [
+ {id:"first_win", name:"FIRST CONTACT", desc:"Win a game"},
+ {id:"bingo1", name:"BINGO!", desc:"Play a 7-tile bingo"},
+ {id:"bingo10", name:"BINGO LORD", desc:"10 career bingos"},
+ {id:"word50", name:"HEAVY ORDNANCE", desc:"Single play worth 50+"},
+ {id:"word80", name:"WORD NUKE", desc:"Single play worth 80+"},
+ {id:"giant", name:"GIANT SLAYER", desc:"Defeat OMEGA-9"},
+ {id:"streak3", name:"ON A TEAR", desc:"Win 3 in a row"},
+ {id:"score300", name:"CENTURION", desc:"Score 300+ in one game"},
+ {id:"daily1", name:"SIGNAL RECEIVED", desc:"Finish a Daily Signal"},
+ {id:"daily3", name:"SIGNAL REGULAR", desc:"Finish 3 Daily Signals"},
+ {id:"allfoes", name:"FULLY SCANNED", desc:"Face all four opponents"},
+ {id:"games25", name:"DEEP SPACE VETERAN", desc:"Play 25 career games"}
+];
+let CAREER = (function(){ try{ const c = JSON.parse(localStorage.getItem("wb_career")); if (c && c.v === 3) return c; }catch(e){} return { v:3, games:0, w:0, l:0, t:0, xp:0, bingos:0, bestWord:0, bestGame:0, streak:0, bestStreak:0, perFoe:{}, ach:{}, daily:{} }; })();
+function saveCareer(){ try{ localStorage.setItem("wb_career", JSON.stringify(CAREER)); }catch(e){} }
+function rankOf(xp){ let cur = RANKS[0], nxt = null; for (let i = 0; i < RANKS.length; i++){ if (xp >= RANKS[i].xp){ cur = RANKS[i]; nxt = RANKS[i + 1] || null; } } return { cur, nxt }; }
+function unlock(id){ if (CAREER.ach[id]) return; CAREER.ach[id] = 1; const a = ACHS.find(x => x.id === id); if (a) toast("🏆 ACHIEVEMENT — " + a.name, 3400); saveCareer(); renderCareer(); }
+function recTextFor(key, r){ const pf = CAREER.perFoe[key]; if (pf && (pf.w || pf.l)) return "CAREER RECORD: " + pf.w + "W – " + pf.l + "L"; return r.w + r.l ? "SESSION RECORD: " + r.w + "W – " + r.l + "L" : "UNTESTED — NO GAMES YET"; }
+function trackPlay(total, bingo){
+  if (bingo){ CAREER.bingos++; unlock("bingo1"); if (CAREER.bingos >= 10) unlock("bingo10"); }
+  if (total > CAREER.bestWord) CAREER.bestWord = total;
+  if (total >= 50) unlock("word50");
+  if (total >= 80) unlock("word80");
+  saveCareer();
+}
+function recordCareer(youWin, tie){
+  CAREER.games++;
+  if (tie) CAREER.t++; else if (youWin) CAREER.w++; else CAREER.l++;
+  CAREER.streak = youWin ? CAREER.streak + 1 : 0;
+  if (CAREER.streak > CAREER.bestStreak) CAREER.bestStreak = CAREER.streak;
+  CAREER.xp += G.you.score + (youWin ? 150 : tie ? 50 : 25);
+  if (G.you.score > CAREER.bestGame) CAREER.bestGame = G.you.score;
+  const k = G.diff.key, pf = CAREER.perFoe[k] || (CAREER.perFoe[k] = { w:0, l:0 });
+  if (!tie) pf[youWin ? "w" : "l"]++;
+  if (G.mode === "daily") CAREER.daily[todayKey()] = { win: youWin, score: G.you.score };
+  saveCareer();
+  if (youWin) unlock("first_win");
+  if (youWin && k === "grandmaster") unlock("giant");
+  if (CAREER.streak >= 3) unlock("streak3");
+  if (G.you.score >= 300) unlock("score300");
+  if (G.mode === "daily") unlock("daily1");
+  if (Object.keys(CAREER.daily).length >= 3) unlock("daily3");
+  if (Object.keys(CAREER.perFoe).length >= 4) unlock("allfoes");
+  if (CAREER.games >= 25) unlock("games25");
+  const rk = rankOf(CAREER.xp);
+  $("overRec").textContent = "CAREER VS " + G.diff.name + ": " + pf.w + "W – " + pf.l + "L · RANK: " + rk.cur.name + " · " + CAREER.xp + " XP";
+  renderCareer();
+}
+function renderCareer(){
+  const p = $("careerPanel"); if (!p) return;
+  const rk = rankOf(CAREER.xp), cur = rk.cur, nxt = rk.nxt;
+  const pct = nxt ? Math.min(100, Math.round((CAREER.xp - cur.xp) / (nxt.xp - cur.xp) * 100)) : 100;
+  const dcount = Object.keys(CAREER.daily).length;
+  p.innerHTML =
+    '<div class="career-head"><span class="career-rank">RANK · ' + cur.name + '</span><span class="career-xp">' + CAREER.xp + ' XP</span></div>' +
+    '<div class="xpbar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="career-sub">' + (nxt ? 'Next rank ' + nxt.name + ' at ' + nxt.xp + ' XP' : 'MAX RANK ACHIEVED') + '</div>' +
+    '<div class="career-stats">' +
+    '<span>CAREER ' + CAREER.w + 'W – ' + CAREER.l + 'L' + (CAREER.t ? ' – ' + CAREER.t + 'T' : '') + '</span>' +
+    '<span>BEST GAME ' + CAREER.bestGame + '</span>' +
+    '<span>BEST WORD ' + CAREER.bestWord + '</span>' +
+    '<span>BINGOS ' + CAREER.bingos + '</span>' +
+    '<span>DAILY SIGNALS ' + dcount + '</span></div>' +
+    '<div class="ach-row">' + ACHS.map(a => '<span class="ach-chip' + (CAREER.ach[a.id] ? ' on' : '') + '" title="' + a.desc + '">' + (CAREER.ach[a.id] ? '🏆 ' : '🔒 ') + a.name + '</span>').join('') + '</div>';
+}
+const MODE_NOTES = { classic: "Full game — play out the whole bag.", quick: "QUICK MATCH — first commander to 150 points wins. Shorter, sharper.", daily: "DAILY SIGNAL — today's tile bag is identical for every commander. One fixed foe: VOLT. New bag at midnight." };
+if (document.querySelectorAll) document.querySelectorAll(".mode-btn").forEach(b => b.addEventListener("click", () => {
+  selectedMode = b.dataset.mode;
+  document.querySelectorAll(".mode-btn").forEach(x => x.classList.toggle("sel", x === b));
+  $("modeNote").textContent = MODE_NOTES[selectedMode];
+  $("diffGrid").style.opacity = selectedMode === "daily" ? ".35" : "1";
+  sfx.turn();
+}));
+renderCareer();
 
 /* ================= BOOT ================= */
 buildBoard();
